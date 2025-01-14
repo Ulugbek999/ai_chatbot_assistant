@@ -11,11 +11,14 @@ import os
 app = Flask(__name__, static_folder='../frontend/static', template_folder='../frontend/templates')
 
 #to set up tables and mock data in the database
+#inserting mock data
 with app.app_context():
     create_tables()
     insert_mock_data()
     create_tables_tech()
     insert_mock_data_tech()
+
+    
 
 load_dotenv()  # take environment variables from .env.
 
@@ -106,30 +109,37 @@ def parse_commands(input_text):
         return "general"
 
 #function to determine what type of chatbot is being currently used and supplying the appropriate data to the chatbot
-def contentSupply(chatBotType): 
+def contentSupply(chatBotType):
+    # Get the directory where this file (app.py) is located
+    base_dir = os.path.dirname(os.path.realpath(__file__))
+
     if chatBotType == "clothing":
+        file_path = os.path.join(base_dir, 'clothingStoreAssistantData.txt')
         try:
-            with open('clothingStoreAssistantData.txt', 'r', encoding='utf-8') as file:
+            with open(file_path, 'r', encoding='utf-8') as file:
                 contentType = file.read()
         except FileNotFoundError:
-            print("The content file was not found.")
+            print("clothingStoreAssistantData.txt not found in:", file_path)
             contentType = "Clothing Assistant data not found."
     elif chatBotType == "tech":
+        file_path = os.path.join(base_dir, 'techAssistantData.txt')
         try:
-            with open('techAssistantData.txt', 'r', encoding='utf-8') as file:
+            with open(file_path, 'r', encoding='utf-8') as file:
                 contentType = file.read()
         except FileNotFoundError:
-            print("The content file was not found.")
+            print("techAssistantData.txt not found in:", file_path)
             contentType = "Tech Assistant data not found."
     elif chatBotType == "travel":
+        file_path = os.path.join(base_dir, 'travelAgencyAssistantData.txt')
         try:
-            with open('travelAgencyAssistantData.txt', 'r', encoding='utf-8') as file:
+            with open(file_path, 'r', encoding='utf-8') as file:
                 contentType = file.read()
         except FileNotFoundError:
-            print("The content file was not found.")
+            print("travelAgencyAssistantData.txt not found in:", file_path)
             contentType = "Travel Assistant data not found."
     else:
         contentType = "Tell the user that something went wrong and you didn't get your data."
+
     return contentType
 
 #function to extract name's and other user information
