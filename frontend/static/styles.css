@@ -1,0 +1,167 @@
+/* ----------------------------------
+   Base & Body
+---------------------------------- */
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+}
+
+body {
+    /* Let the body stretch to full height */
+    min-height: 100vh;
+}
+
+/* ----------------------------------
+   Header & Footer
+---------------------------------- */
+header, footer {
+    background-color: #333; /* darker background */
+    color: #fff;            /* white text */
+    text-align: center;
+    padding: 15px 0;
+}
+header h1 {
+    margin: 0;
+}
+
+/* You can tweak the footer style similarly */
+footer p {
+    margin: 0;
+}
+
+/* ----------------------------------
+   Main Content
+---------------------------------- */
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+/* The chatbot selection buttons */
+#chatbotSelection button {
+    padding: 10px 20px;
+    margin: 10px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#chatbotSelection button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* ----------------------------------
+   Slideshow Background
+---------------------------------- */
+.bgImage {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: opacity 1s ease-in-out;
+    opacity: 0;
+    z-index: -1; /* behind everything */
+}
+.bgImage.active {
+    opacity: 1;
+}
+
+/* ----------------------------------
+   Chatbot Display
+---------------------------------- */
+#chatbotDisplay {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+
+    width: 600px;
+    max-width: 90%;
+    min-height: 400px;            /* base vertical size */
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
+    box-sizing: border-box;
+}
+
+/* ----------------------------------
+   Chat Area & Message Styling
+---------------------------------- */
+#chatArea {
+    position: relative;
+    height: 300px;  /* Fixed height for scrolling */
+    overflow-y: auto;
+    width: 100%;
+    padding: 10px;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+}
+
+.message {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    max-width: 70%;
+    margin: 5px 0;
+    padding: 10px;
+    border-radius: 15px;
+    word-wrap: break-word;
+}
+
+.user-message {
+    align-self: flex-end;
+    background-color: #dcf8c6;  /* Light green for user messages */
+    color: #000;
+}
+
+.system-message {
+    align-self: flex-start;
+    background-color: #f1f0f0;  /* Light grey for assistant messages */
+    color: #000;
+}
+
+.message.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ----------------------------------
+   Responsive Design
+---------------------------------- */
+@media (max-width: 600px) {
+    #chatbotDisplay {
+        width: 95%;
+        padding: 10px;
+    }
+
+    #chatbotSelection button {
+        width: 100%;
+        margin: 5px 0;
+    }
+
+    header, footer {
+        font-size: 14px;
+    }
+  
+    #chatArea {
+        height: 200px;
+    }
+    #userInput, #chatbotDisplay button {
+        font-size: 14px;
+        padding: 6px;
+    }
+}
