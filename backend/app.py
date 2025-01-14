@@ -192,6 +192,7 @@ def chat():
 
     contentType = contentSupply(chatbot_type)
     context_window.append({"role": "user", "content": user_input})
+
     import re
 
     # Regex to capture a sequence of 6+ digits from the user's message
@@ -348,4 +349,6 @@ def chat():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 5000))  # Get PORT from environment, default to 5000
+    app.run(host='0.0.0.0', port=port)
+
