@@ -13,9 +13,9 @@ app = Flask(__name__, static_folder='../frontend/static', template_folder='../fr
 #to set up tables and mock data in the database
 with app.app_context():
     create_tables()
-    #insert_mock_data()
+    insert_mock_data()
     create_tables_tech()
-    #insert_mock_data_tech()
+    insert_mock_data_tech()
 
 load_dotenv()  # take environment variables from .env.
 
