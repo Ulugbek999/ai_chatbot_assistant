@@ -176,10 +176,9 @@ Push to your fork (git push origin feature-name).
 Open a Pull Request.
 
 9. License
-This project is licensed under the MIT License. See the LICENSE file for details.
 
 10. Contact
 Author: Bek Abdurakhmonov
-Email: [your_email@example.com]
-GitHub: https://github.com/yourusername
+Email: UAbdurakhmonov00@student.coppin.edu
+GitHub: https://github.com/Ulugbek999
 Feel free to reach out with questions or suggestions!
