@@ -6,9 +6,11 @@ from database import connect_db
 from models import create_tables_tech, insert_mock_data_tech, insert_tech_user
 import os
 from dotenv import load_dotenv
-import os
+from flask import Flask, session
 
 app = Flask(__name__, static_folder='../frontend/static', template_folder='../frontend/templates')
+app.secret_key = 'the_secret_key_for_now.'  # <-- REQUIRED for sessions
+
 
 #to set up tables and mock data in the database
 #inserting mock data
@@ -31,7 +33,7 @@ else:
 
 openai.api_key = api_key
 
-session_memory = {}  # Session memory for storing names and relationships
+#session_memory = {}  # Session memory for storing names and relationships -> no longer used as it saves all the user info from different users
 context_window = []  # Context window to hold last 5-10 exchanges
 user_info = [] # To store user info such as their names, emails, phone numbers
 
@@ -194,6 +196,7 @@ def extract_user_info(input_text):
 
     return None  # Return None if no patterns match
 
+
 @app.route('/chat', methods=['POST'])
 def chat():
     data = request.json or {}
@@ -209,8 +212,8 @@ def chat():
     # Adjust the pattern if your tracking numbers have a fixed length or format
     tracking_pattern = re.search(r'\b(\d{6,})\b', user_input)
     if tracking_pattern:
-        session_memory["tracking"] = tracking_pattern.group(1)
-        print(f"DEBUG: Found tracking number = {session_memory['tracking']}")
+        session["tracking"] = tracking_pattern.group(1)
+        print(f"DEBUG: Found tracking number = {session['tracking']}")
 
     def parse_command(text):
         track_keywords = ["track", "tracking number", "check shipment"]
@@ -230,15 +233,15 @@ def chat():
     parsed_info = extract_user_info(user_input)
     if parsed_info is not None:
         key, value = parsed_info
-        session_memory[key] = value
+        session[key] = value
 
     system_additional_context = ""
 
     # If it's the tech bot, attempting to store user info (for further research purposes)
     if chatbot_type == 'tech':
-        user_name = session_memory.get('user')
-        user_email = session_memory.get('email')
-        user_phone = session_memory.get('phone')
+        user_name = session.get('user')
+        user_email = session.get('email')
+        user_phone = session.get('phone')
 
         if user_name or user_email or user_phone:
             if not user_name:
@@ -258,7 +261,7 @@ def chat():
 
     # If user wants to track an order, we use the stored tracking number
     if user_intent == "track":
-        tracking_num = session_memory.get("tracking", None)
+        tracking_num = session.get("tracking", None)
         if tracking_num:
             conn = connect_db()
             cur = conn.cursor()
@@ -331,7 +334,7 @@ def chat():
         else:
             return ""
 
-    summary_text = memory_summary(session_memory)
+    summary_text = memory_summary(session)
 
     messages = []
     messages.append({"role": "system", "content": contentType})
