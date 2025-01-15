@@ -205,11 +205,21 @@ def chat():
 
     contentType = contentSupply(chatbot_type)
 
-    if context_window not in session:
+    if 'context_window' not in session:
         session['context_window'] = []
 
+    # Append user input to the context window
     session['context_window'].append({"role": "user", "content": user_input})
 
+    # Limit the context window to the last 5 messages
+    session['context_window'] = session['context_window'][-5:]
+
+    # Save the session after updating it
+    session.modified = True
+
+    # When passing context to OpenAI's API
+    messages = session['context_window']
+    
     import re
 
     # Regex to capture a sequence of 6+ digits from the user's message
@@ -364,7 +374,7 @@ def chat():
         app.logger.error(f"An error occurred: {str(e)}")
         return jsonify({"error": str(e)}), 500
     
-    
+
 @app.route('/logout', methods=['GET'])
 def logout():
     session.clear()
