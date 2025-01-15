@@ -204,7 +204,11 @@ def chat():
     chatbot_type = data.get('chatbot_type', 'general')
 
     contentType = contentSupply(chatbot_type)
-    context_window.append({"role": "user", "content": user_input})
+
+    if context_window not in session:
+        session['context_window'] = []
+
+    session['context_window'].append({"role": "user", "content": user_input})
 
     import re
 
@@ -359,6 +363,12 @@ def chat():
     except Exception as e:
         app.logger.error(f"An error occurred: {str(e)}")
         return jsonify({"error": str(e)}), 500
+    
+    
+@app.route('/logout', methods=['GET'])
+def logout():
+    session.clear()
+    return "Session cleared", 200
 
 
 if __name__ == '__main__':
