@@ -203,32 +203,28 @@ def chat():
     user_input = data.get('user_input', '')
     chatbot_type = data.get('chatbot_type', 'general')
 
+    # 1) Retrieve the chatbot's system instructions from your data files
     contentType = contentSupply(chatbot_type)
 
+    # 2) Ensure each user has their own context window in session
     if 'context_window' not in session:
         session['context_window'] = []
-
-    # Append user input to the context window
+    
+    # 3) Store the user's message in their context window
     session['context_window'].append({"role": "user", "content": user_input})
-
-    # Limit the context window to the last 5 messages
+    # Limit to last 5 messages
     session['context_window'] = session['context_window'][-5:]
-
-    # Save the session after updating it
     session.modified = True
 
-    # When passing context to OpenAI's API
-    messages = session['context_window']
-    
     import re
 
-    # Regex to capture a sequence of 6+ digits from the user's message
-    # Adjust the pattern if your tracking numbers have a fixed length or format
+    # 4) If the user’s message contains a 6+ digit tracking number, store it in session
     tracking_pattern = re.search(r'\b(\d{6,})\b', user_input)
     if tracking_pattern:
         session["tracking"] = tracking_pattern.group(1)
         print(f"DEBUG: Found tracking number = {session['tracking']}")
 
+    # 5) Detect user intent (track shipment vs. check inventory vs. general)
     def parse_command(text):
         track_keywords = ["track", "tracking number", "check shipment"]
         check_inv_keywords = ["do you have", "check inventory", "available", "size"]
@@ -243,17 +239,19 @@ def chat():
 
     user_intent = parse_command(user_input)
 
-    # Extract name/email/phone if found
+    # 6) Extract name/email/phone; store them in session
     parsed_info = extract_user_info(user_input)
     if parsed_info is not None:
         key, value = parsed_info
         session[key] = value
+        session.modified = True
 
+    # 7) Potential additional system context
     system_additional_context = ""
 
-    # If it's the tech bot, attempting to store user info (for further research purposes)
+    # 8) If tech bot, store user info in DB
     if chatbot_type == 'tech':
-        user_name = session.get('user')
+        user_name = session.get('user')   # from session
         user_email = session.get('email')
         user_phone = session.get('phone')
 
@@ -265,15 +263,17 @@ def chat():
             if not user_phone:
                 user_phone = "Unknown"
 
+            # Only insert if at least one is not "Unknown"
             if (user_name, user_email, user_phone) != ("Unknown", "Unknown", "Unknown"):
                 user_id = insert_tech_user(user_name, user_phone, user_email)
-                print(f"DEBUG: Inserted user with ID {user_id}, Name: {user_name}, Phone: {user_phone}, Email: {user_email}")
+                print(f"DEBUG: Inserted user with ID {user_id}, "
+                      f"Name: {user_name}, Phone: {user_phone}, Email: {user_email}")
                 system_additional_context += (
                     f"I have saved your details to our tech support system. "
                     f"Your user ID is {user_id}. "
                 )
 
-    # If user wants to track an order, we use the stored tracking number
+    # 9) If user wants to track an order
     if user_intent == "track":
         tracking_num = session.get("tracking", None)
         if tracking_num:
@@ -332,6 +332,7 @@ def chat():
                     f"Sorry, we don’t have {product} in size {size} in stock."
                 )
 
+    # 10) Summarize known user info from the session
     def memory_summary(mem):
         summary_parts = []
         if "user" in mem:
@@ -350,6 +351,7 @@ def chat():
 
     summary_text = memory_summary(session)
 
+    # 11) Build the system messages
     messages = []
     messages.append({"role": "system", "content": contentType})
     if summary_text:
@@ -357,22 +359,31 @@ def chat():
     if system_additional_context:
         messages.append({"role": "system", "content": system_additional_context})
 
-    # Include the last few messages to maintain conversation context
-    messages += context_window[-5:]
+    # 12) Add user’s conversation from the session-based context window
+    # (We already appended the user’s message above)
+    # to the final messages we send to OpenAI
+    messages += session['context_window']
 
     try:
+        # 13) Call OpenAI with the final list of messages
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=messages
         )
         reply = response['choices'][0]['message']['content']
-        context_window.append({"role": "assistant", "content": reply})
+
+        # 14) Store the assistant's response in the session context
+        session['context_window'].append({"role": "assistant", "content": reply})
+        # Keep last 5
+        session['context_window'] = session['context_window'][-5:]
+        session.modified = True
 
         return jsonify({"response": reply})
 
     except Exception as e:
         app.logger.error(f"An error occurred: {str(e)}")
         return jsonify({"error": str(e)}), 500
+
     
 
 @app.route('/logout', methods=['GET'])
