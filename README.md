@@ -121,7 +121,7 @@ from dotenv import load_dotenv
 load_dotenv()
 ---
 
-##4. Running the App Locally
+## 4. Running the App Locally
 Ensure your virtual environment is activated.
 Run the Flask application:
 
@@ -131,7 +131,7 @@ You should see the homepage and be able to select different chatbots and interac
 
 ---
 
-##5. Database Setup
+## 5. Database Setup
 Your application automatically creates necessary tables on startup using functions in models.py. It creates separate SQLite databases for clothing and tech assistants.
 
 To manually check if data is being saved:
@@ -147,7 +147,7 @@ to verify user data is stored correctly.
 
 ---
 
-##6. Deployment
+## 6. Deployment
 Deploying on Heroku
 Ensure Procfile and requirements.txt are in the root directory.
 Log in to Heroku:
