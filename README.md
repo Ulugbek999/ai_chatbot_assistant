@@ -36,7 +36,24 @@
 
 ## Project Structure
 ```
-project_root/ │ ├── app.py # Main Flask application ├── models.py # Database models and helper functions ├── database.py # Database connection functions ├── requirements.txt # Python dependencies ├── Procfile # For Heroku deployment ├── runtime.txt # Specifies Python version (optional) ├── .env # Environment variables (not committed to GitHub) ├── README.md # Project documentation │ ├── static/ # Static assets (CSS, JS, images) │ ├── styles.css │ ├── scripts.js │ └── images/ # Background images and other assets │ └── templates/ └── index.html # Main HTML template
+project_root/
+│
+├── app.py # Main Flask application
+├── models.py # Database models and helper functions
+├── database.py # Database connection functions
+├── requirements.txt # Python dependencies
+├── Procfile # For Heroku deployment
+├── runtime.txt # Specifies Python version (optional)
+├── .env # Environment variables (not committed to GitHub)
+├── README.md # Project documentation
+│
+├── static/ # Static assets (CSS, JS, images)
+│ ├── styles.css
+│ ├── scripts.js
+│ └── images/ # Background images and other assets
+│
+└── templates/
+└── index.html # Main HTML template
 ```
 
 ---
@@ -88,9 +105,7 @@ source venv/bin/activate
 Install dependencies:
 
 pip install -r requirements.txt
-```
 
----
 
 ## 3. Configuration
 Environment Variables
